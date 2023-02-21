@@ -1,0 +1,118 @@
+/* Deep-purple Light scheme (Default) */
+/* Can be forced with data-theme="light" */
+[data-theme="light"],
+:root:not([data-theme="dark"]) {
+  --primary: #5e35b1;
+  --primary-hover: #512da8;
+  --primary-focus: rgba(94, 53, 177, 0.125);
+  --primary-inverse: #FFF;
+}
+
+/* Deep-purple Dark scheme (Auto) */
+/* Automatically enabled if user has Dark mode enabled */
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --primary: #5e35b1;
+    --primary-hover: #673ab7;
+    --primary-focus: rgba(94, 53, 177, 0.25);
+    --primary-inverse: #FFF;
+  }
+}
+
+/* Deep-purple Dark scheme (Forced) */
+/* Enabled if forced with data-theme="dark" */
+[data-theme="dark"] {
+  --primary: #5e35b1;
+  --primary-hover: #673ab7;
+  --primary-focus: rgba(94, 53, 177, 0.25);
+  --primary-inverse: #FFF;
+}
+
+/* Deep-purple (Common styles) */
+:root {
+  --form-element-active-border-color: var(--primary);
+  --form-element-focus-color: var(--primary-focus);
+  --switch-color: var(--primary-inverse);
+  --switch-checked-background-color: var(--primary);
+}
+
+.hidden {
+  display: none;
+}
+
+.small-text {
+  font-size: medium;
+}
+
+.form-padding {
+  padding: 0 10vw 0 10vw;
+}
+
+.form-button {
+  width: 10vw;
+}
+
+.center-text {
+  text-align: center;
+}
+
+.centered {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.inline-img {
+  height: 1.5rem;
+}
+
+.inline-img-large {
+  height: 2rem;
+}
+
+.smaller {
+  width: 25%;
+  height: 25%;
+}
+
+.small {
+  width: 50%;
+  height: 50%;
+}
+
+#message {
+  color: #a32e2c;
+}
+
+@media screen and (max-width: 992px) {
+  
+  .form-padding {
+    padding: 0;
+  }
+
+  .form-button {
+    width: 30vw;
+  }
+
+  .centered {
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .smaller {
+    width: 50%;
+    height: 50%;
+  }
+  
+  .multiple-media-div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .multiple-media-div > img {
+    object-fit: cover;
+    height: fit-content;
+    width: fit-content;
+  }
+}

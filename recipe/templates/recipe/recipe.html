@@ -1,0 +1,294 @@
+{% extends "recipe/layout.html" %}
+
+{% block script %}
+
+    <script>
+
+        // Handle edit recipe button state and divs
+        addEventListener('DOMContentLoaded', () => {
+
+            // Buttons    
+            editButton = document.querySelector('#edit-button');
+            deleteButton = document.querySelector('#delete-button');
+            recipeContent = document.querySelector('#recipe-content');
+            editRecipe = document.querySelector('#edit-recipe');
+        
+            // Toggle edit view
+            let editState = 'hidden';
+            try {
+                editButton.addEventListener('click', () => {
+
+                    if (editState === 'hidden') {
+                        recipeContent.style.display = 'none';
+                        editRecipe.style.display = 'block';
+                        editButton.innerHTML = 'Close';
+                        editState = 'shown';
+                    } else {
+                        recipeContent.style.display = 'block';
+                        editRecipe.style.display = 'none';
+                        editButton.innerHTML = 'Edit';
+                        editState = 'hidden';
+                    }
+                })
+            }
+            catch(TypeError) {
+                // Ignore, the user visiting the recipe page is not the author
+            }
+
+            // Delete recipe button
+            try {
+                deleteButton.addEventListener('click', () => {
+                    document.querySelector('#modal').open = true;
+
+                    document.querySelector('#cancel').addEventListener('click', () => {
+                        document.querySelector('#modal').open = false;
+                    })
+                })
+            }
+            catch(TypeError) {
+                // Ignore, the user visiting the recipe page is not the author
+            }
+
+            // List 
+            document.querySelector('#list-button').addEventListener('click', () => {
+                document.querySelector('#list-modal').open = true;
+
+                document.querySelector('#list-cancel').addEventListener('click', () => {
+                    document.querySelector('#list-modal').open = false;
+                })
+            })
+
+            // Hide and show input field for new list
+            dropdown = document.querySelector('#dropdown');
+            newList = document.querySelector('#new-list');
+            newListInput = document.querySelector('#new-list-input');
+            createBtn = document.querySelector('#create-new-list');
+            dropdown.addEventListener('change', () => {
+                if (newList.selected === false) {
+                    newListInput.style.display = 'none';
+                    createBtn.innerHTML = 'Add';
+                } else {
+                    newListInput.style.display = 'block';
+                    createBtn.innerHTML = 'Create & Add';
+                }
+            })
+            
+            // Delete comment buttons
+            deleteCommentBtns = document.querySelectorAll('#delete-comment').forEach(button => {
+                button.addEventListener('click', () => {
+                
+                    // Hide every other confirmation div
+                    document.querySelectorAll('#confirmation-div').forEach(div => {
+                        div.style.display = 'none';
+                    })
+
+                    // Show every other delete button
+                    document.querySelectorAll('#delete-comment').forEach(button => {
+                        button.style.display = 'block'
+                    })
+
+                    // Hide delete button then show confirmation div
+                    button.style.display = 'none';
+                    div = button.parentNode;
+                    childDiv = div.querySelector('div');
+                    childDiv.style.display = 'grid';
+
+                    // Revert to original when the cancel button is clicked
+                    childDiv.querySelector('#delete-comment-cancel').addEventListener('click', () => {
+                        childDiv.style.display = 'none';
+                        button.style.display = 'block';
+                    })
+                    //cancelBtn.style.display = 'block';
+                })
+            })
+        })
+
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+    
+        <div id="recipe-content">
+            <div class="margin2 ta-center">
+                <h2>{{ recipe.title }}</h2>
+                <div class="picture-container">
+                    <img src="{% if not recipe.author.profile.picture %}https://i.ibb.co/YfKj1mp/Black-Pepper.png{% else %}{{recipe.author.profile.picture.url}}{% endif %}" alt="User's profile picture" class="user-profile-picture">
+                </div>
+                <small>By <a href="{% url 'profile' recipe.author %}">{{ recipe.author }}</a>, {{ recipe.time }}</small>
+                <div id="recipe-interactions" class="grid margin2 flex-jc-c">
+                    <div>
+                        <button id="list-button" class="contrast">
+                            <i class="fa-solid fa-list"></i>
+                        </button>
+                    </div>
+                    <form action="{% url 'like' recipe.id %}" method="post">
+                        {% csrf_token %}
+                        <button class="contrast">
+                            {% if liked %}
+                                <i class="fa-solid fa-heart"></i>
+                            {% else %}
+                                <i class="fa-regular fa-heart"></i>
+                            {% endif %}
+                        </button>
+                    </form>
+                    <div>
+                        <h2>{{recipe.yummy.count}}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid ta-justify padding5-lr">
+                <h4><em>{{ recipe.description }}</em></h4>
+            </div>
+            
+            <div class="flex-jc-c">
+                <img class="recipe-image" src="{% if recipe.image %}{{ recipe.image.url }}{% else %}https://i.ibb.co/nCpzBM5/DALL-E-2023-01-30-11-48-47-cooking-egg-with-cast-iron-skillet-3-D-pixel-art.png{% endif %}" alt="">
+            </div>
+            
+            <div class="grid grid-two-one">
+                <article class="fit-content">
+                    <header class="ta-center"><strong>Instructions</strong></header>
+                    <body>{{ recipe.directions|linebreaks }}</body>
+                </article>
+                <article class="fit-content">
+                    <header class="ta-center"><strong>Ingredient List</strong></header>
+                    <body>{{ recipe.ingredients|linebreaks }}</body>
+                </article> 
+            </div>
+            {% if recipe.notes %}
+                <article>
+                    <header class="ta-center"><strong>Additional Notes</strong></header>
+                    <body>{{ recipe.notes }}</body>
+                </article>
+            {% endif %}
+            <!-- Comments -->
+            <div>
+                <article>
+                    <h2 class="flex-jc-c">Comments</h2>
+                    <form action="{% url 'comment' recipe.id %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{form}}
+                        <button class="width10">Comment!</button>
+                    </form>
+                    <body>
+                        {% for comment in comments %}
+                            <article>
+                                {% if comment.user == request.user %}
+                                <header class="comment-delete-container">
+                                    <form class="hidden-form" action="{% url 'delete_comment' %}" method="post">
+                                        {% csrf_token %}
+                                        <div>
+                                            <button id="delete-comment" style="font-size: large; text-align: left;" class="btn-astext error-dim" type="button">Delete</button>
+                                            <div id="confirmation-div" class="grid width10" style="display:none">
+                                                <button id="delete-comment-cancel" style="font-size: large; text-align: left;" class="btn-astext contrast" type="button">Cancel</button>
+                                                <button id="delete-comment-confirm" style="font-size: large; text-align: left;" class="btn-astext error-dim" name="comment" value="{{comment.id}}" type="submit">Confirm</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </header>
+                                {% endif %}
+                                <div class="grid" style="grid-template-columns: 1fr 3fr;">
+                                    <div class="picture-container-comment">
+                                        <img src="{% if not comment.user.profile.picture %}https://i.ibb.co/YfKj1mp/Black-Pepper.png{% else %}{{comment.user.profile.picture.url}}{% endif %}" alt="User's profile picture" class="user-profile-picture-comment">
+                                    </div>
+                                    <div>
+                                        <h4 style="margin-top: 0.5rem;">{{ comment.user }}:</h4>
+                                        <p>{{ comment.content}}</p>
+                                        {% if comment.image %}
+                                        <img class="comment-image" src="{{comment.image.url}}" alt="Comment image">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </article>
+                        {% empty %}
+                            <p>No comments.</p>
+                        {% endfor %}
+                    </body>
+                    {% if comments %}
+                    <footer>
+                        <div class="grid ta-center">
+                            <div class="grid">
+                                {% if comments.has_previous %}
+                                    <a href="{% url 'recipe' recipe.id %}">
+                                        <i class="fa-solid fa-backward-step"></i>
+                                    </a>
+                                    <a href="{% url 'recipe_page' recipe.id comments.previous_page_number %}">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <div>
+                                Page {{ comments.number }} of {{ comments.paginator.num_pages }}.
+                            </div>
+                            <div class="grid">
+                                {% if comments.has_next %}
+                                    <a href="{% url 'recipe_page' recipe.id comments.next_page_number %}">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </a>
+                                    <a href="{% url 'recipe_page' recipe.id comments.paginator.num_pages %}">
+                                        <i class="fa-solid fa-forward-step"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </footer>
+                    {% endif %}
+                </article>
+            </div>
+        </div>
+        <!-- Editing recipe -->
+        {% if recipe.author == request.user %}
+        <div id="edit-buttons" class="grid margin3 flex-jc-c">
+            <button id="edit-button" class="outline contrast width10">Edit</button>
+            <button id="delete-button" class="error-bg outline contrast width10">Delete</button>
+        </div>
+        <div style="display:none;" id="edit-recipe">
+            <form action="{% url 'edit_recipe' recipe.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{edit_form}}
+                <div class="flex-jc-c" >
+                    <button class="width10 contrast" type="submit">Update</button>  
+                </div>
+            </form>
+        </div>
+        <!-- Confirm -->
+        <form action="{% url 'delete_recipe' recipe.id %}" method="post">
+            {% csrf_token %}
+            <dialog class="flex-jc-c" id="modal">
+            <article class="ta-center">
+                <h3>Are you sure that you want to delete this recipe?</h3>
+                <p>
+                There is no going back! <strong>{{recipe.title}}</strong> will be lost along with all the data it contains.
+                </p>
+                <footer class="flex-jc-c">
+                <button class="secondary width10" id="cancel" role="button" type="button">Cancel</button>
+                <button class="width10 error-bg contrast outline" type="submit" id="confirm" role="button">Confirm</button>
+                </footer>
+            </article>
+            </dialog>       
+        </form>
+        {% endif %}
+    </div>
+    <dialog id="list-modal">
+        <article style="width: 100vw" class="ta-center">
+          <h3>Select a list to add this recipe to:</h3>
+          <form action="{% url 'add_to_list' recipe.id %}" method="post">
+            {% csrf_token %}
+            <select name="list" id="dropdown">
+                <option id="new-list" value="" selected>Create New List</option>
+                {% for list in lists %}
+                <option value="{{list.id}}">{{list.name}}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="new-list-name" id="new-list-input" placeholder="Name for your new list">
+            <button class="secondary width10" id="list-cancel" role="button" type="button">Cancel</button>
+            <button class="width10" type="submit" id="create-new-list" role="button">Create & Add</button>
+        </form>
+          </footer>
+        </article>
+      </dialog>
+        
+
+{% endblock %}

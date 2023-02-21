@@ -1,0 +1,99 @@
+{% extends "recipe/layout.html" %}
+
+{% block body %}
+
+    <div class="container">
+
+        <h3 class="ta-center padding1 margin2">Ready for discovering new tastes, {{ request.user }}?</h3>
+
+        <div id="homepage" class="grid ta-center grid-one-two">
+            
+            <div>
+                
+                <h5 class="primary-dim">A random taste!</h5>
+                
+                {% if random_recipe %}
+                <article class="id-recipe relative">
+                    <a href="{% url 'recipe' random_recipe.id %}">
+                        <span class="image-link"></span>
+                    </a>
+                    <header>
+                        <strong>{{random_recipe.title}}</strong>
+                    </header>    
+                    <img class="homepage-img-left" src="{% if random_recipe.image %}{{ random_recipe.image.url }}{% else %}https://i.ibb.co/nCpzBM5/DALL-E-2023-01-30-11-48-47-cooking-egg-with-cast-iron-skillet-3-D-pixel-art.png{% endif %}" alt="recipe">
+                </article>
+                {% else %}
+                    <p>Nothing to show.</p>
+                {% endif %}
+
+                <h5 class="primary-dim">Latest Recipes</h5>
+
+                {% for recipe in latest_list %}
+                <article class="id-recipe relative">
+                    <a href="{% url 'recipe' recipe.id %}">
+                        <span class="image-link"></span>
+                    </a>
+                    <header>
+                            <strong>{{recipe.title}}</strong>
+                        </header>
+                        <img class="homepage-img-left" src="{% if recipe.image %}{{ recipe.image.url }}{% else %}https://i.ibb.co/nCpzBM5/DALL-E-2023-01-30-11-48-47-cooking-egg-with-cast-iron-skillet-3-D-pixel-art.png{% endif %}" alt="recipe">
+                    </article>
+                        {% empty %}
+                         <p>Nothing to show.</p>
+                    {% endfor %}
+                
+            </div>
+            <div>
+                
+                <h4 class="primary">Latest From Your Favorite Cooks</h4>
+
+                {% for recipe in user_list %}
+                <article class="id-recipe relative">
+                    <a href="{% url 'recipe' recipe.id %}">
+                        <span class="image-link"></span>
+                    </a>
+                    <header class="relative">
+                        <strong>{{recipe.title}}</strong> from <em>{{recipe.author|title}}</em>
+                    </header>
+                        <img class="margin1-t homepage-img-right" src="{% if recipe.image %}{{ recipe.image.url }}{% else %}https://i.ibb.co/nCpzBM5/DALL-E-2023-01-30-11-48-47-cooking-egg-with-cast-iron-skillet-3-D-pixel-art.png{% endif %}" alt="recipe">
+                    <footer>
+                        <em>{{recipe.description}}</em>
+                    </footer>
+                </article>
+                    {% empty %}
+                    <article>
+                        <p>Nothing to show.</p>
+                    </article>
+                {% endfor%}
+                {% if user_list %}
+                <div id="page-switch" class="grid ta-center">
+                    <div class="grid">
+                        {% if user_list.has_previous %}
+                            <a class="pagination-link" href="{% url 'homepage' %}">
+                                <i class="fa-solid fa-backward-step"></i>
+                            </a>
+                            <a class="pagination-link" href="{% url 'homepage_page' user_list.previous_page_number %}">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="pagination-count">
+                        <p>Page {{ user_list.number }} of {{ user_list.paginator.num_pages }}.</p> 
+                    </div>
+                    <div class="grid">
+                        {% if user_list.has_next %}
+                            <a class="pagination-link" href="{% url 'homepage_page' user_list.next_page_number %}">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                            <a class="pagination-link" href="{% url 'homepage_page' user_list.paginator.num_pages %}">
+                                <i class="fa-solid fa-forward-step"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "recipe/layout.html" %}
+
+{% block style %}
+{% endblock %}
+
+{% block script %}
+    <script>
+
+          addEventListener('DOMContentLoaded', () => {
+
+          // Buttons 
+          const createAccount = document.querySelector('#create');
+          const login = document.querySelector('#login');
+
+          // Divs
+          newAccountForm = document.querySelector('#registration-form');
+          newAccountForm.style.display = 'block';
+          loginForm = document.querySelector('#login-form');
+          loginForm.style.display = 'none';
+          
+
+          createAccount.addEventListener('click', () => {
+                  newAccountForm.style.display = 'block';
+                  loginForm.style.display = 'none';
+          })
+
+          login.addEventListener('click', () => {
+                  loginForm.style.display = 'block';
+                  newAccountForm.style.display = 'none';
+          })
+
+          // Handle login and register failure
+          loginErr = document.querySelector('#login-message');
+          registerErr = document.querySelector('#register-message');
+
+          // Login attempt failed
+          if (loginErr.innerHTML === 'Incorrect username or password.') {
+            
+            // Show login form, remember entered username
+            newAccountForm.style.display = 'none';
+            loginForm.style.display = 'block';
+            document.querySelector('#login-username').value = "{{ username }}"; 
+
+          } else if (registerErr.innerHTML !== '') {
+
+            document.querySelector('#register-email').value = "{{ email }}"; 
+            document.querySelector('#register-username').value = "{{ username }}"; 
+          }
+
+
+      })
+
+    </script>
+{% endblock %}
+
+{% block body %}
+
+    <div id="page" class="grid">
+
+        <!-- Introduction -->
+        <div id="intro" class="container-fluid">
+            <h1 class="top-text">Welcome to <strong><ins class="primary">BlackPepper</ins>!</strong></h1>
+            <h2 class="middle-text">An online community where you can share your <em><ins class="primary">delicious</ins></em> recipes with the world!</h2>
+            <h3 class="bottom-text">It is for <em><ins class="primary">everyone</ins>!</em> Whether be a <em>professional</em>, an <em>enthusiast</em> or just <em>starting out</em>. <strong>Join now!</strong></h3>
+        </div>
+
+        <!-- Login -->
+        <div id="login-form" class="container-fluid user-form">
+            <form action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    <h4>Login</h4>
+
+                    <label>Welcome back!</label>
+                    <!-- Grid -->
+                    <div class="grid">
+                
+                        <!-- Username and password -->
+                        <input id="login-username" type="text" name="username" required placeholder="Username">
+                        <input type="password" name="password" required placeholder="Password">
+        
+                    </div>
+                  
+                    <!-- Button -->
+                    <small id="login-message" class="error">{{ login_error }}</small>
+                    <button type="submit">Login</button>
+                  
+            </form>
+        </div>
+
+        <!-- Register -->
+        <div id="registration-form" class="container-fluid user-form">
+            <form action="{% url 'register' %}" method="post">
+                {% csrf_token %}
+
+                <h4>Create an Account</h5>
+                <input id="register-email" type="email" name="email" placeholder="Email address" required>
+                <input id="register-username" type="text" name="username" placeholder="Username" required>
+
+                <!-- Grid -->
+                <label>Please choose a password and confirm it.</label>
+                <div class="grid">
+                    <input type="password" name="password" placeholder="Password" required>
+                    <input type="password" name="confirm" placeholder="Re-enter" required>
+                </div>
+
+                <input type="submit" value="Join!">
+                <small id="register-message" class="error">{{ register_error }}</small>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+

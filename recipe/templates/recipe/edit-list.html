@@ -1,0 +1,85 @@
+{% extends "recipe/layout.html" %}
+
+{% block script %}
+
+    <script>
+
+        addEventListener('DOMContentLoaded', () => {
+
+            
+            document.querySelector('#delete-list').addEventListener('click', () => {
+                document.querySelector('#modal').open = true;
+
+                document.querySelector('#cancel').addEventListener('click', () => {
+                    document.querySelector('#modal').open = false;
+                })
+            })
+        })
+
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+
+    <div class="container">
+
+        <div class="container-fluid grid margin5-t padding5-lr">
+            <h2 class="margin1-t">Change List Name:</h2>
+            <form action="" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="event" value="rename-list">
+                <input type="text" value="{{list.name}}" name="rename-list" placeholder="List Name">
+                <button>Save</button>
+            </form>
+        </div>
+        <div>
+            <h3>Remove a recipe from list:</h3>
+            {% for recipe in list.recipe.all %}
+                <article class="grid edit-list-grid">
+                    <div class="grid profile-recipe">
+                        <a href="{% url 'recipe' recipe.id %}">
+                            <span class="image-link"></span>
+                        </a>
+                        <img class="profile-image" src="{% if recipe.image %}{{ recipe.image.url }}{% else %}https://i.ibb.co/nCpzBM5/DALL-E-2023-01-30-11-48-47-cooking-egg-with-cast-iron-skillet-3-D-pixel-art.png{% endif %}" alt="recipe">
+                        <p><strong>{{ recipe.title }}</strong></p>
+                        <p class="block ta-justify"><em>{{ recipe.description }}</em></p>
+                    </div>
+                    <form class="margin1-t" action="" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="recipe" value="{{recipe.id}}">
+                        <input type="hidden" name="event" value="remove-recipe">
+                        <button class="error-bg contrast outline">Remove</button>
+                    </form>
+                </article>
+                <footer><br></footer>
+                {% empty %}
+                <article>
+                    Empty list.
+                </article>
+            {% endfor %}
+        </div>
+        <div class="margin2 flex-jc-c">
+            <button id="delete-list" class="width10 error-bg contrast outline">Delete List</button>
+        </div>
+    </div>
+    <form action="" method="POST">
+        {% csrf_token %}
+    <dialog class="flex-jc-c" id="modal">
+        <article class="ta-center">
+            <h3>Are you sure that you want to delete this list?</h3>
+            <p>
+            There is no going back! <strong>{{list.name}}</strong> will be lost along with all the data it contains.
+            </p>
+            <footer class="flex-jc-c">
+            <input type="hidden" name="event" value="delete-list">
+            <button class="secondary width10" id="cancel" role="button" type="button">Cancel</button>
+            <button class="width10 error-bg contrast outline" type="submit" id="confirm" role="button">Confirm</button>
+            </footer>
+        </article>
+        </dialog>  
+    
+    </form>
+
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "recipe/layout.html" %}
+
+{% block script %}
+    <script>
+
+        addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#back').addEventListener('click', () => {
+                window.history.back();
+            })
+        })
+        
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="margin2 flex-jc-c">
+            <button id="back" class="contrast outline width10">
+                Go back
+            </button>
+        </div>  
+        <div id="recipe-content">
+            <div class="margin2 ta-center">
+                <h2>{{ recipe.title }}</h2>
+                <small>By <a href="#">{{ recipe.author }}</a>, {{ recipe.time }}</small>
+                <div id="recipe-interactions" class="grid margin2 flex-jc-c">
+                    <div>    
+                        <button class="contrast">
+                            <i class="fa-solid fa-list"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <button class="contrast">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <h2>0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid ta-justify padding5-lr">
+                <h4><em>{{ recipe.description }}</em></h4>
+            </div>
+            <div class="flex-jc-c">
+                <img class="recipe-image" src="{{ recipe.image }}" alt="">
+            </div>
+            <div class="grid grid-two-one">
+                <article class="fit-content">
+                    <header class="ta-center"><strong>Instructions</strong></header>
+                    <body>{{ recipe.directions|linebreaks }}</body>
+                </article>
+                <article class="fit-content">
+                    <header class="ta-center"><strong>Ingredient List</strong></header>
+                    <body>{{ recipe.ingredients|linebreaks }}</body>
+                </article> 
+            </div>
+            {% if recipe.notes %}
+                <article>
+                    <header class="ta-center"><strong>Additional Notes</strong></header>
+                    <body>{{ recipe.notes }}</body>
+                </article>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

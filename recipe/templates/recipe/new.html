@@ -1,0 +1,172 @@
+{% extends "recipe/layout.html" %}
+
+{% block script %}
+
+    <script>
+
+        // Handle navbar links section, color change for the selected route
+        addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#nav-new').classList.remove('contrast');
+            document.querySelector('#nav-home').classList.add('contrast');
+
+            // Get elements
+            share = document.querySelector('#share');
+            preview = document.querySelector('#preview');
+            modal = document.querySelector('#modal');
+            cancel = document.querySelector('#cancel');
+
+            // Check the fields to enable share button and change character counts
+            addEventListener('input', () => {
+
+                // Get input values
+                title = document.querySelector('#id_title').value;
+                description = document.querySelector('#id_description').value;
+                
+                directions = document.querySelector('#id_directions').value;
+                ingredients = document.querySelector('#id_ingredients').value;
+                notes = document.querySelector('#id_notes').value;
+
+                // Update
+                document.querySelector('#title_count').innerHTML = `${title.length}/64`;
+                document.querySelector('#description_count').innerHTML = `${description.length}/256`;
+                
+                document.querySelector('#directions_count').innerHTML = `${directions.length}/2048`;
+                document.querySelector('#ingredients_count').innerHTML = `${ingredients.length}/512`;
+                document.querySelector('#notes_count').innerHTML = `${notes.length}/256`;
+                
+                if (title && description && directions && ingredients) {
+                    share.disabled = false;
+                    preview.disabled = false;
+                } else {
+                    share.disabled = true;
+                    preview.disabled = true;
+                }
+            })
+
+            // On preview
+            preview.addEventListener('click', () => {
+                
+                // Get current values for fields
+                title = document.querySelector('#id_title').value;
+                description = document.querySelector('#id_description').value;
+                image = document.querySelector('#id_image').value;
+                directions = document.querySelector('#id_directions').value;
+                ingredients = document.querySelector('#id_ingredients').value;
+                notes = document.querySelector('#id_notes').value;
+
+                // Apply to the hidden values of the preview form
+                document.querySelector('#preview-title').value = title;
+                document.querySelector('#preview-description').value = description ;
+                document.querySelector('#preview-image').value = image;
+                document.querySelector('#preview-ingredients').value = ingredients;
+                document.querySelector('#preview-directions').value = directions;
+                document.querySelector('#preview-notes').value = notes;
+            })
+
+            // On submit
+            share.addEventListener('click', () => {
+                modal.open = true;
+
+                cancel.addEventListener('click', () => {
+                    modal.open = false;
+                })
+            })
+        })
+
+        // ADD CHARACTER COUNTER 
+
+        
+
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <h2>New Recipe</h2>
+        <form action="{% url 'new' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="container margin1-t" id="recipe-creation">
+                <div class="grid grid-one-two"> 
+                    <label for="title">
+                        <em class="primary-dim">(Required)</em>
+                        <br>
+                        {{ form.title.label }}
+                        <span class="primary" id="title_count">0/64</span>
+                        {{ form.title }}
+                    </label>
+                    <label for="description">
+                        <em class="primary-dim">(Required)</em>
+                        <br>
+                        {{ form.description.label }}
+                        <span class="primary" id="description_count">0/256</span>
+                        {{ form.description }}
+                    </label>
+                </div>
+                <div class="grid" style="display:flex; justify-content: center;">
+                    <label for="image">
+                        <em class="primary-dim">(If left blank the default image will be displayed)</em>
+                        <br>
+                        {{ form.image.label }}
+                        {{ form.image }}
+                    </label>
+                </div>
+                <div class="grid grid-two-one">
+                    <label for="directions">
+                        <em class="primary-dim">(Required)</em>
+                        <br>
+                        {{ form.directions.label }}
+                        <span class="primary" id="directions_count">0/2048</span>
+                        {{ form.directions }}
+                    </label>
+                    <label for="ingredients">
+                        <em class="primary-dim">(Required)</em>
+                        <br>
+                        {{ form.ingredients.label }}
+                        <span class="primary" id="ingredients_count">0/512</span>
+                        {{ form.ingredients }}
+                    </label>
+                </div>
+                <div class="grid">
+                    <label for="notes">
+                        {{ form.notes.label }}
+                        <span class="primary" id="notes_count">0/256</span>
+                        {{ form.notes }}
+                    </label>
+                </div>
+            </div>
+            <!-- Confirm -->
+            <dialog id="modal">
+                <article class="ta-center">
+                <h3>Is it ready to share?</h3>
+                <p>
+                    You will be able to edit your recipe later.
+                </p>
+                <footer id="modal-button-container">
+                    <button class="secondary width10" id="cancel" role="button" type="button">Cancel</button>
+                    <button class="width10" type="submit" id="confirm" role="button">Confirm</button>
+                </footer>
+                </article>
+            </dialog>
+        </form>
+        <div id="preview-container" class="flex-jc-c padding5-lr grid">
+            <div>
+                <form class="hidden-form" action="{% url 'preview' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input id="preview-title" type="hidden" name="title">
+                    <input id="preview-description" type="hidden" name="description">
+                    <input id="preview-image" type="hidden" name="image">
+                    <input id="preview-directions" type="hidden" name="directions">
+                    <input id="preview-ingredients" type="hidden" name="ingredients">
+                    <input id="preview-notes" type="hidden" name="notes">
+                    <button id="preview" class="width10 outline" disabled>Preview</button>
+                    </form> 
+                </div>
+                <div class="flex-jc-c">       
+                    <button id="share" class="width10" type="button" disabled>Share!</button>
+                </div>
+            </div>
+    </div>  
+
+{% endblock %}

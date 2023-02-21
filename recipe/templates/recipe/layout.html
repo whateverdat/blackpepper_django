@@ -1,0 +1,107 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Pico.css https://picocss.com/docs/ -->
+        <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+        <title>{% block title %}BlackPepper{% endblock %}</title>
+        <link href="{% static 'recipe/styles.css' %}" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/21a0dea3ca.js" crossorigin="anonymous"></script>
+        <script src="{% static 'recipe/theme.js' %}"></script>
+        <script src="{% static 'recipe/flashMessage.js' %}"></script>
+        {% block script %}{% endblock %}
+        {% block style %}{% endblock %}
+        <script>
+
+            addEventListener('DOMContentLoaded', () => {
+
+                // Searchbar: disable form submission if the query is less than three characters
+                let searchForm = document.querySelector('#search-form');
+                let searchQuery = document.querySelector('#search');
+                searchForm.addEventListener('submit', () => {
+                    if (searchQuery.value.length < 3) {
+                        event.preventDefault();
+                    } else {
+                        searchForm.submit();
+                    }
+                })
+            })
+
+        </script>
+    </head>
+    <body>
+        <!-- Navbar https://picocss.com/docs/navs.html--> 
+        <div id="nav-container "class="container">
+            <nav id="navbar">
+                <!-- Logo and name -->
+                <ul>
+                    <li><img id="logo" class="navbar-logo" src="https://i.ibb.co/YfKj1mp/Black-Pepper.png"></li>
+                    <a href="/" class="contrast">
+                        <li><strong>BlackPepper</strong></li>
+                    </a>
+                </ul>
+                {% if user.is_authenticated %}
+                <ul>
+                    <li><a id="nav-lists" class="contrast" href="{% url 'user_lists' %}">Lists</a></li>
+                    <li><a id="nav-watch" class="contrast" href="{% url 'following' %}">Watching</a></li>
+                </ul>
+                <!-- Searchbar -->
+                <ul>
+                    <form id="search-form" class="hidden-form" action="{% url 'search' %}" method="post">
+                        {% csrf_token %}
+                        <input class="navbar-search" type="search" id="search" name="search" placeholder="Search">
+                    </form>
+                </ul>
+                <!-- Navlinks -->
+                <ul>
+                    <li><a id="nav-home" href="{% url 'homepage' %}">Home</a></li>
+                    <li><a id="nav-new" class="contrast" href="{% url 'new' %}">Create</a></li>
+                    <li><a id="nav-profile" class="contrast" href="{% url 'profile' request.user %}">Profile</a></li>
+                </ul>        
+                
+                {% endif %}
+                <!-- Login and Register -->
+                <ul>
+                    {% if user.is_authenticated %}
+                    <li><a id="logout" href="/logout" role="button" class="secondary outline">Logout</a></li>
+                    <li style="position: relative; height:1rem; bottom: 1.3rem;">
+                        <button style="font-size: 14px;" class="outline secondary" id="dark-mode-toggle">
+                            <i id="theme-icon" class="fa-regular fa-lightbulb"></i>
+                        </button>
+                    </li>
+                    {% elif request.path != "/" %}
+                    <li><a id="login" href="/">Login</a></li>
+                    <li><a id="create" href="/" role="button" class="outline">Create an Account</a></li>
+                    {% else %}
+                    <li><a id="login" href="#">Login</a></li>
+                    <li><a id="create" href="#" role="button" class="outline">Create an Account</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <div class="body">
+            {% block body %}
+            {% endblock %}
+        </div>
+        <div id="footer">
+            
+        </div>
+
+        <div id="message">
+            {% if messages %}
+            <article class="message grid" style="grid-template-columns: 10fr 1fr;">
+                {% for message in messages %}
+                <body{% if message.tags %} class="{{ message.tags }}"{% endif %}><strong>{{ message }}</strong></body>
+                {% endfor %}
+                <button id="close-message" class="btn-astext width10" style="font-size: large;"><kbd>Close x</kbd></button>
+            </article>
+            {% endif %}
+        </div>
+
+    </body>
+</html>

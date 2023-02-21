@@ -1,0 +1,239 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <script src="https://kit.fontawesome.com/21a0dea3ca.js" crossorigin="anonymous"></script>
+    <title>BlackPepper | Help</title>
+    <script src="{% static 'help/help.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'help/theme.css' %}">
+</head>
+<body>
+    <!-- Page -->
+    <div id="page-container" class="container-fluid">
+        {% if message %}
+        <div class="center-text">
+            <small id="message">{{message}}</small>
+        </div>
+        {% endif %}
+        <div id="navigation">
+            <article class="center-text">
+                <h2><strong>BlackPepper</strong> HELP</h2>
+                <div class="grid">
+                    <button class="nav-btn" id="app-manuel-btn">Learn/How To</button>
+                    <button class="nav-btn" id="ticket-btn">Report Problem/Request Help</button>
+                    <button class="nav-btn" id="contact-btn">Contact</button>
+                </div>
+                <div class="container-fluid">
+                <input id="query" type="text" placeholder="Search among titles">
+                </div>
+            </article>
+        </div>
+        <div class="section container" id="help-text">
+            <article class="flex">
+                <p class="small-text"><strong>1. LEARN/HOW TO: </strong>Information on how to use BlackPepper, common questions and basic information regarding the functionality of the site.</p>
+                <p class="small-text"><strong>2. REPORT A PROBLEM/REQUEST HELP: </strong>Contact for subjects related to BlackPepper. Whether to require assistance on site-related subjects, suggesting improvements, or reporting bugs--which are much appreciated!</p>
+                <p class="small-text"><strong>3. CONTACT: </strong>Contact for any other unrelated subject.</p>
+            </article>
+        </div>
+        <div class="hidden section container" id="app-manuel">
+            <article>
+                <h3 class="center-text">MANUEL</h3>
+                <footer class="header">
+                    <!-- Recipe section -->
+                    <div class="title">
+                        <h4 class="center-text">RECIPES</h4>
+                        <p>Recipes are the type of content in BlackPepper. Each consist of 4 compulsory: <strong>Title, Description, List of Ingredients and Directions;</strong>
+                        and 2 optional fields: <strong>Image and Additional Notes</strong>.
+                        <br>
+                        <br>
+                        <strong>Title</strong>, <strong>Description</strong> and <strong>Image</strong> are used to display your recipe outside of recipe page itself (on homepage, search results, profile page etc.)
+                        <strong>List of Ingredients</strong>, <strong>Directions</strong> and <strong>Additional Notes</strong> are the main content of a recipe, they provide the reader with the neccessary information
+                        to cook the dish, with additional information, tips and tricks.</p>
+                    </div>
+                    <!-- Subtitle Create Recipe -->
+                    <div class="sub title"">
+                        <h5 class="sub-title">CREATE RECIPE</h5>
+                        <p>To create a recipe, you must be logged in, then access the recipe creation page by clicking '<strong>Create</strong>' button located in the navigation bar:</p>
+                        <img class="centered" src="https://i.ibb.co/d0sLh5s/create-Recipe.png" alt="Create Recipe">
+                        <br>
+                        <br>
+                        <p>After all the fields that are tagged with <span><img class="inline-img" src="https://i.ibb.co/hyF7xRk/required.png" alt="Required Field"></span> are filled, the <strong>Submit</strong> and <strong>Preview</strong> buttons
+                        will become available at the bottom of the page:</p>
+                        <img class="centered" src="https://i.ibb.co/6sdmYSk/share-Buttons.png" alt="Create Recipe Buttons">
+                    </div>
+                    <!-- Subtitle Edit Recipe -->
+                    <!-- End of subtitle -->
+                    <div class="sub title"">
+                        <h5 class="sub-title">EDIT RECIPE</h5>
+                        <p>To edit your existing recipe, you must be logged in to your account that is the author of the recipe and scroll to the bottom of the page to find the '<strong>Edit</strong>' button:</p>
+                        <img class="centered" src="https://i.ibb.co/Ky4X1ZF/edit-Recipe.png" alt="Edit Recipe">
+                    </div>
+                    <!-- End of subtitle -->
+                    <!-- Subtitle Delete Recipe -->
+                    <div class="sub title"">
+                        <h5 class="sub-title">DELETE RECIPE</h5>
+                        <p>In a similar proces to edit your recipe, you can click the '<strong>Delete</strong>' button, located next to the Edit button.</p>
+                    </div>
+                    <!-- End of subtitle -->      
+                </footer>
+                <!-- End of Recipe section -->
+                <!-- List section -->
+                <footer class="header">
+                    <div class="title">
+                        <h4 class="center-text">LISTS</h4>
+                        <p>A List is a way of grouping and organizing recipes. Whether yours or other people's, you can combine and create a list for your personal use. You can access your recipes from the navigation bar's '<strong>Lists</strong>' link:</p>
+                        <img class="centered" src="https://i.ibb.co/W2rfm6b/Lists.png" alt="Lists">
+                        <br>
+                        <p>You can add recipes to your '<strong>Lists</strong>' by visiting the page of the recipe you want to add to your list, then clicking on 
+                            <span><img class="inline-img-large" src="https://i.ibb.co/0mH7J5q/listBtn.png" alt="List Button"></span> just below the recipe-author information.</p>
+                    </div>
+                    <!-- Subtitle Create List  -->
+                    <div class="sub title"">
+                        <h5>CREATE LISTS</h5>
+                        <p>You can create '<strong>Lists</strong>' by clicking to '<strong>Create a list</strong>' button located on '<strong>Lists</strong>' page and selecting a name for your list.</p>
+                        <img class="centered smaller" src="https://i.ibb.co/NV3XG8q/create-List-Btn.png" alt="Create List Button">
+                        <br>
+                        <p>Alternatively, you can create a new '<strong>List</strong>' directly from any recipe page. Just select '<strong>Create New List</strong>' option while adding a recipe your lists. </p>
+                        <img class="centered small" src="https://i.ibb.co/HrZyStN/create-List-From-Recipe-Page.png" alt="Create List From Recipe Page">
+                    </div>
+                    <!-- End of subtitle -->
+                    <!-- Subtitle Edit Lists -->
+                    <div class="sub title"">
+                        <h5>EDIT LISTS</h5>
+                        <p>You can edit your lists from your '<strong>Lists</strong>' page, by clicking the '<strong>Edit</strong>' button that belongs to the list you want to edit:</p>
+                        <img class="centered smaller" src="https://i.ibb.co/SypYjK3/edit-List-Btn.png" alt="Edit List Button">
+                        <br>
+                        <p>From this page, you can rename your list or remove recipes from it.</p>
+                    </div>
+                    <!-- End of subtitle -->
+                    <!-- Subtitle Delete Lists -->
+                    <div class="sub title">
+                        <h5>DELETE LISTS</h5>
+                        <p>From the page to edit a specific list, you can choose to delete a list altogether, by simply clicking the '<strong>Delete</strong>' button, located at the bottom of the page:</p>
+                        <img class="centered smaller" src="https://i.ibb.co/9GQd3Ms/delete-List-Btn.png" alt="Delete List Button">
+                    </div>
+                    <!-- End of subtitle -->
+                </footer>
+                <!-- End of Lists section -->
+                <!-- Following/Watching section -->
+                <footer class="header">
+                    <div class="title">
+                        <h4 class="center-text">FOLLOWING/WATCHLIST</h4>
+                        <p>You can add the creators who's recipes you like to your '<strong>Watchlist</strong>', which is essentially '<strong>Follow</strong>ing' them.
+                        You can add any user to your list by visiting their profile and clicking the '<strong>Watch</strong>' button, located just below their name and profile picture:</p>
+                        <img class="centered" src="https://i.ibb.co/B4D9HWk/watchBtn.png" alt="Watch Button">
+                        <br>
+                        <p>Once the user is added to your '<strong>Watchlist</strong>' they will show up on your '<strong>Watching</strong>' page, accessed from navigation bar:</p>
+                        <img class="centered" src="https://i.ibb.co/FDdgfmZ/Watching.png" alt="Watching">
+                        <br>
+                        <p>Additionally, their latest recipes will show up on your homepage, under the title '<strong>Latest From Your Favorite Cooks</strong>':</p>
+                        <img class="centered" src="https://i.ibb.co/S0LrFTD/homepage-Watch.png" alt="">
+                    </div>
+                </footer>
+                <!-- End of Watch section -->
+                <!-- Profile section -->
+                <footer class="header">
+                    <div class="title">
+                        <h4 class="center-text">PROFILE CUSTOMIZATION</h4>
+                        <p>Users on BlackPepper can set pictures to be displayed on their profile, and set a '<strong>Bio</strong>' that introduces them to the community! Your '<strong>Profile Picture</strong>' will be displayed
+                            on the page of your recipes and in search results, along with your bio!</p>
+                    </div>
+                    <!-- Subtitle Bio -->
+                    <div class="sub title">
+                        <h5>BIO</h5>
+                        <p>You see your bio on your profile, above your profile information. By clicking the '<strong>Change</strong>' button located below your bio, you can set a brief introduction:</p>
+                        <img class="centered" src="https://i.ibb.co/FKWPhvZ/change-Bio.png" alt="Change Bio Button">
+                        <br>
+                        <p>By submitting the bio field as empty, you can '<strong>Remove</strong>' your current bio and set it as empty:</p>
+                        <div class="multiple-media-div">
+                            <img src="https://i.ibb.co/yXCbNX1/setBio.png" alt="Remove Bio">
+                            <img src="https://i.ibb.co/7nsXm1D/emptyBio.png" alt="Empty Bio">
+                        </div>
+                    </div>
+                    <!-- End of subtitle -->
+                    <!-- Subtitle Profile Picture -->
+                    <div class="sub title">
+                        <h5>PROFILE PICTURE</h5>
+                        <p>Your '<strong>Profile Picture</strong>' is displayed in your recipes, comments and show up in search results. You can set it by heading over to your profile
+                        and clicking first on the '<strong>Options</strong>' button under your profile picture, then on '<strong>Change Profile Picture</strong>' button:</p>
+                        <img class="centered small" src="https://i.ibb.co/RjmjLNg/Options.png" alt="Profile Options">
+                        <br>
+                        <p>In a similar fashion to bios, you can '<strong>Remove</strong>' your profile picture by clicking the '<strong>Remove</strong>' button, prior to uploading any file.</p>
+                        <img class="centered smaller" src="https://i.ibb.co/K9DMNNk/remove-Profile.png" alt="Remove Profile Picture">
+                    </div>
+                    <!-- End of subtitle -->
+                </footer>
+                <!-- End of Profile section -->
+                <!-- Image Upload section -->
+                <footer class="header">
+                    <div class="title">
+                        <h4 class="center-text">IMAGE UPLOADS</h4>
+                        <p>You can upload images alongside your recipes, which is recommended! Select a file from the '<strong>Image to Display</strong>' section while creating a recipe:</p>
+                        <img class="centered" src="https://i.ibb.co/XbJGQdz/image-Upload.png" alt="Image upload">
+                        <br>
+                        <p>You can later change this image via '<strong>Edit Recipe</strong>' option located on the bottom of the recipe page, however once you set up an image for a recipe, you <u>cannot</u> set the recipe image to empty!</p>
+                        <img class="centered smaller" src="https://i.ibb.co/j5hMzK4/editBtn.png" alt="">
+                    </div>
+                </footer>
+                <!-- Endof Image Upload section -->
+                <!-- Theme Section -->
+                <footer class="header">
+                    <div class="title">
+                        <h4 class="center-text">THEME</h4>
+                        <p>BlackPepper has two different '<strong>Themes</strong>', one of which is dark and the other one is bright! 
+                            You can easily switch between them according to your preference or need by clicking on the
+                            '<strong>Light Bulb</strong>' <span><img class="inline-img" src="https://i.ibb.co/t8s2jJS/light-Bulb.png" alt="Light Bulb"></span> icon located in the navigation bar.</p>
+                    </div>
+                </footer>
+                <footer class="no-match hidden">
+                    <p>No match.</p>
+                </footer>
+            </article>
+        </div>
+        <div class="hidden section container" id="ticket">
+            <article>
+                <h3 class="center-text">REPORT A PROBLEM/REQUEST HELP</h3>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="grid form-padding">
+                        {{support_form.request}}
+                        {{support_form.email}}
+                    </div>
+                    <div class="container form-padding">
+                        {{support_form.subject}}
+                        {{support_form.content}}
+                    </div>
+                    <div class="form-padding">
+                        <button class="form-button" type="submit">Submit</button>
+                    </div>
+                </form>
+            </article>
+        </div>
+        <div class="hidden section container" id="contact">
+            <article>
+                <h3 class="center-text">CONTACT</h3>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="id_request" value="1">
+                    <div class="grid form-padding">
+                        {{contact_form.email}}
+                    </div>
+                    <div class="container form-padding">
+                        {{contact_form.subject}}
+                        {{contact_form.content}}
+                    </div>
+                    <div class="form-padding">
+                        <button class="form-button" type="submit">Submit</button>
+                    </div>
+                </form>
+            </article>
+        </div>
+    </div>
+    
+</body>
+</html>

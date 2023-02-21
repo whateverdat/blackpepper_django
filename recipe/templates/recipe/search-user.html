@@ -1,0 +1,127 @@
+{% extends "recipe/layout.html" %}
+
+{% block script %}
+
+    <script>
+
+        addEventListener('DOMContentLoaded', () => {
+            // Change navbar search form action
+            document.querySelector('form').action = "{% url 'search_user' %}";
+
+            dropdown = document.querySelector('#dropdown');
+            form = document.querySelector('#dropdown-form');
+
+            try {
+                dropdown.addEventListener('change', ({target}) => target.form.submit());
+            } catch (TypeError) {
+                // No multiple page result
+            }
+        })
+
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <article>
+        <header class="grid">
+            <h2>Search Results for:<em class="primary-dim"> {{query|title}}</em></h2>
+            <form action="{% url 'search' %}" method="post">
+                {%csrf_token%}
+                <button class="contrast outline" name="search" value={{query}}>
+                    Recipes
+                </button>
+            </form>
+            <form action="{% url 'search_user' %}" method="post">
+                {%csrf_token%}
+                <button class="contrast" name="search" value={{query}}>
+                    Users
+                </button>
+            </form>
+        </header>
+        {% if results.paginator.num_pages > 1  %}
+        <div class="grid flex-jc-e margin1-t" style="grid-template-columns: 1fr 1fr;">
+            <form id="dropdown-form" action="{% url 'search_user' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" value="{{query}}" name="search">
+                <select id="dropdown" name="page" class="width10" required>
+                    {% for num in results.paginator.page_range %}
+                        {% if num == results.number %}
+                            <option value="{{num}}" selected>Page {{ num }}</option>
+                        {% else %}
+                            <option value="{{num}}">Page {{ num }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        {% endif %}
+        {% for result in results %}
+        <footer class="id-recipe grid user-results-grid" style="vertical-align: middle; padding: 1rem 5rem 0 0; top:2rem; height: fit-content; width: 90%; left: 5%;">
+            <a href="{% url 'profile' result.user %}">
+                <span class="image-link"></span>
+            </a>
+            <div class="picture-container">
+                <img src="{% if not result.picture %}https://i.ibb.co/YfKj1mp/Black-Pepper.png{% else %}{{result.picture.url}}{% endif %}" alt="User's profile picture" class="user-profile-picture-search">
+            </div>
+            <p>{{result.user}}</p>
+            <p>{% if result.bio %}
+                {{result.bio}}
+                {% else %}
+                No bio.
+                {% endif %}
+            </p>
+            <p>{{result.followed_by.count}} Followers</p>
+            <p>{{result.recipe.count}} Recipes</p>
+        </footer>
+        {% empty %}
+            <h2 class="ta-center margin2">Nothing to show.</h2>  
+        {% endfor %}
+    
+    {% if results %}
+    <div class="grid ta-center margin1-t" id="page-switch-search">
+        <div class="grid margin2">
+            {% if results.has_previous %}
+            <form action="{% url 'search_user' %}" method="post">
+                {%csrf_token%}
+                <button class="btn-astext" name="search" value={{query}}>
+                    <i class="fa-solid fa-backward-step"></i>
+                </button>
+            </form>
+                <form action="{% url 'search_user_page' results.previous_page_number %}" method="post">
+                    {%csrf_token%}
+                <button class="btn-astext" name="search" value={{query}}>
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="pagination-count margin2">
+            {% if results.paginator.num_pages == 1 or results.number == results.paginator.num_pages %}
+                <p>End of results.</p>
+            {% else %}
+                <p>Page {{ results.number }} of {{ results.paginator.num_pages }}.</p>
+            {% endif %}
+        </div>
+        <div class="grid margin2">
+            {% if results.has_next %}
+            <form action="{% url 'search_user_page' results.next_page_number %}" method="post">
+                {%csrf_token%}
+                <button class="btn-astext" name="search" value={{query}}>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+                <form action="{% url 'search_user_page' results.paginator.num_pages %}" method="post">
+                    {%csrf_token%}
+                <button class="btn-astext" name="search" value={{query}}>
+                    <i class="fa-solid fa-forward-step"></i>
+                </button>
+            </form>
+            {% endif %}
+    </article>
+</div>
+{% endif %}
+
+{% endblock %}

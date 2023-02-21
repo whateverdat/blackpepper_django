@@ -1,0 +1,80 @@
+{% extends "recipe/layout.html" %}
+
+{% block script %}
+
+    <script>
+
+        addEventListener('DOMContentLoaded', () => {
+
+            // Change navbar link highlight
+            document.querySelector('#nav-watch').classList.remove('contrast');
+            document.querySelector('#nav-home').classList.add('contrast');
+
+            // Dynamic search within following list
+            let noMatch = document.querySelector('#no-match');
+            let input = document.querySelector('#user-search');
+            input.addEventListener('input', async function() {
+                
+                result = false; // To check if there are any matching results,
+                document.querySelectorAll('.id-recipe').forEach(user => {
+                    if (user.children[2].innerHTML.includes(input.value.toLowerCase())) {
+                        if (window.innerWidth < 992) {
+                            user.style.display = 'flex';
+                        } else {
+                            user.style.display = 'grid';
+                        }
+                        result = true;
+                    } else {
+                        user.style.display = 'none';
+                    }
+                    if (result) {
+                        noMatch.style.display = 'none';
+                    } else {
+                        noMatch.style.display = 'block';
+                    }
+                }) 
+        });
+
+        })
+
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container margin1-t">
+    <h2 class="margin2 padding5-lr">Watch List</h2>
+        <input id="user-search" value="" placeholder="Search">
+        <div style="grid-template-columns: 1fr 1fr;">
+    {% for user in users %}
+
+            <article class="id-recipe grid relative" style="grid-template-columns: 0fr 1fr 1fr 5fr 1fr 1fr;">
+                <a href="{% url 'profile' user.user %}">
+                    <span class="image-link"></span>
+                </a>
+                <div class="picture-container">
+                    <img src="{% if not user.picture %}https://i.ibb.co/YfKj1mp/Black-Pepper.png{% else %}{{user.picture.url}}{% endif %}" alt="User's profile picture" class="user-profile-picture-watch">
+                </div>
+                <p><strong>{{ user.user }}</strong></p>
+                {% if user.bio %}
+                    <p>{{ user.bio }}</p>
+                {% else %}
+                    <p>No bio.</p>
+                {% endif %}
+                <p>Followers: {{ user.followed_by.count }}</p>
+                <p>Recipes: {{ user.recipe.count }}</p>
+            </article>
+            {% empty %}
+            <article>
+                Nothing to show.
+            </article>
+            {% endfor %}
+            <article id="no-match" style="display: none;">
+                No match.
+            </article>
+        </div>
+    <br>
+</div>
+            
+{% endblock %}

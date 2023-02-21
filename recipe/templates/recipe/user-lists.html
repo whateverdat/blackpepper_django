@@ -1,0 +1,151 @@
+{% extends "recipe/layout.html" %}
+
+{% block script %}
+
+    <script>
+
+        addEventListener('DOMContentLoaded', () => {
+
+            // Change navbar link highlight
+            document.querySelector('#nav-lists').classList.remove('contrast');
+            document.querySelector('#nav-home').classList.add('contrast');
+
+            // Dynamic list search
+            let noMatch = document.querySelector('#no-match');
+            let input = document.querySelector('#list-search');
+            input.addEventListener('input', async function() {
+
+                result = false;
+                document.querySelectorAll('#list').forEach(list => {
+                    if (list.children[0].innerHTML.toLocaleLowerCase().includes(input.value.toLowerCase())) {
+                        list.style.display = 'grid';
+                        result = true;
+                    } else {
+                        list.style.display = 'none';
+                    }
+                    if (result) {
+                        noMatch.style.display = 'none';
+                    } else {
+                        noMatch.style.display = 'block';
+                    }
+                })
+            })
+
+            // Dynamic searhc within lists
+            document.querySelectorAll('#recipe-search').forEach(search => {
+                search.addEventListener('input', async function() {
+                    listId = search.className;
+                    result = false;
+                    recipes = document.querySelectorAll(`#recipe-${listId}`).forEach(recipe => {
+                        if (recipe.children[2].innerHTML.toLowerCase().includes(search.value.toLowerCase())){
+                            if (window.innerWidth < 992) {
+                                recipe.style.display = 'flex';
+                            } else {
+                                recipe.style.display = 'grid';
+                            }
+                            result = true;
+                        } else {
+                            recipe.style.display = 'none';
+                        }
+                        if (result) {
+                            document.querySelector(`#no-recipe-match-${listId}`).style.display = 'none';
+                        } else {
+                            document.querySelector(`#no-recipe-match-${listId}`).style.display = 'block';
+                        }
+                    })
+                    
+                })
+            })
+
+            // Buttons
+            newBtn = document.querySelector('#create-list');
+            cancelBtn = document.querySelector('#cancel');
+            modal = document.querySelector('#modal');
+            submitBtn = document.querySelector('#submit');
+
+            newBtn.addEventListener('click', () => {
+                modal.open = true;
+
+                cancelBtn.addEventListener('click', () => {
+                    modal.open = false;
+                })
+            })
+        })
+
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="margin2">
+            <div class="padding5-lr">
+                <h2>Your Lists</h2>
+            </div>
+            <div id="create-list-container" class="grid flex-jc-c">
+                <input id="list-search" value="" placeholder="Search for a list">
+                <button class="width10" id="create-list">Create a list</button>
+            </div>
+            {% for list in lists %}
+            <article id="list">
+                <header>
+                    {{list.name}}
+                </header>
+                <div id="user-list-header" class="flex-jc-c padding5-lr">
+                    {% if list.recipe.all %}
+                    <input id="recipe-search" class="{{list.id}}" value="" placeholder="Search in '{{list.name}}'">
+                    <div style="margin-left: 1rem;">
+                        <form action="{% url 'edit_list' list.id %}" method="get">
+                            <button class="outline secondary width10">Edit List</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div>
+                        <form action="{% url 'edit_list' list.id %}" method="get">
+                            <button class="outline secondary width10">Edit List</button>
+                        </form>     
+                    </div>
+                    {% endif %}
+                </div>
+                {% for recipe in list.recipe.all %}
+                <footer id="recipe-{{list.id}}" class="relative grid results-grid {{list.id}} recipe">
+                    <a href="{% url 'recipe' recipe.id %}">
+                        <span class="image-link"></span>
+                    </a>
+                    <img class="search-image" src="{% if recipe.image %}{{ recipe.image.url }}{% else %}https://i.ibb.co/nCpzBM5/DALL-E-2023-01-30-11-48-47-cooking-egg-with-cast-iron-skillet-3-D-pixel-art.png{% endif %}" alt="">
+                    <p>{{recipe.title}}</p>
+                    <p>{{recipe.description}}</p>
+                </footer>
+                {% empty %}
+                    Empty List
+                {% endfor %}
+                <footer style="display:none;" id="no-recipe-match-{{list.id}}">
+                    No match.
+                </footer>
+            </article>
+                {% empty %}
+                <article>
+                    Nothing to show.
+                </article>
+            {% endfor %}
+        </div>
+        <article id="no-match" style="display: none;">
+            No match.
+        </article>
+    </div>
+    <dialog id="modal">
+        <article style="width: 100vw" class="ta-center">
+          <h3>New List</h3>
+          <form action="{% url 'create_list' %}" method="post">
+          {% csrf_token %}
+          <input type="text" name="name" placeholder="New List Name">
+          <footer id="modal-button-container" class="ta-center">
+                <button class="secondary width10" id="cancel" role="button" type="button">Cancel</button>
+                <button class="width10" type="submit" id="confirm" role="button">Create</button>
+            </form>
+          </footer>
+        </article>
+      </dialog>
+
+{% endblock %}

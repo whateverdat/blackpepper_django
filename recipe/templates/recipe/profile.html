@@ -1,0 +1,271 @@
+{% extends "recipe/layout.html" %}
+
+{% block script %}
+
+    <script>
+
+        // Handle navbar links section, color change for the selected route
+        addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#nav-profile').classList.remove('contrast');
+            document.querySelector('#nav-home').classList.add('contrast');
+
+            if (document.querySelector('#error-msg')) {
+                document.querySelector('#modal').open = true;
+
+                document.querySelector('#password-cancel').addEventListener('click', () => {
+                        document.querySelector('#modal').open = false;
+                })
+            }
+
+            // Change password
+            try {
+                document.querySelector('#password-btn').addEventListener('click', () => {
+                    document.querySelector('#modal').open = true;
+
+                    document.querySelector('#password-cancel').addEventListener('click', () => {
+                        document.querySelector('#modal').open = false;
+                    })
+                })
+            } catch (TypeError) {
+                // Ignore, not user's profile
+            }
+
+            // Check if new password matches the confirmation, dynamically activate submit button
+            newPassword = document.querySelector('#new-password');
+            confirmPassword = document.querySelector('#confirm-password');
+            submitPassword = document.querySelector('#submit-password');
+            error = document.querySelector('#error');
+            // This error message is null on a fresh visit, it is rendered by django after an unsuccessful attempt
+            errorMessage = document.querySelector('#error-msg'); 
+
+            // Detect input 
+            try {
+                confirmPassword.addEventListener('input', () => {
+
+                    // Remove if an error message is already present from earlier attempt
+                    if (errorMessage) {
+                        errorMessage.style.display = 'none';
+                    }
+
+                    // Compare fields
+                    if (newPassword.value != confirmPassword.value) {
+                        submitPassword.disabled = true;
+                        error.innerHTML = 'Passwords do not match.';
+                        
+                    } else {
+                        submitPassword.disabled = false;
+                        error.innerHTML = '';
+
+                        // Detect input on the previous field and reconfirm
+                        newPassword.addEventListener('input', () => {
+                            if (newPassword.value != confirmPassword.value) {
+                                submitPassword.disabled = true;
+                                error.innerHTML = 'Passwords do not match.';
+                        
+                            } else {
+                                submitPassword.disabled = false;
+                                error.innerHTML = '';
+                            }
+                        })
+                    }
+                })
+            } catch (TypeError) {
+                // Not user's profile
+            }
+
+            // Bio change form
+            try {
+                btn = document.querySelector('#edit-btn');
+
+                btn.addEventListener('click', () => {
+
+                    if (document.querySelector('#edit-bio').style.display === 'none') {
+                        document.querySelector('#edit-bio').style.display = 'block';
+                        btn.innerHTML = 'Close';
+                        document.querySelector('#bio').style.display = 'none';
+                    } else {
+                        document.querySelector('#edit-bio').style.display = 'none';
+                        btn.innerHTML = 'Change';
+                        document.querySelector('#bio').style.display = 'block';
+                    }
+                })
+            } catch (TypeError) {
+                // Ignore, not user's profile
+            }
+
+            // Profile picture
+            try {
+                picForm = document.querySelector('#picture-form'); 
+                picBtn = document.querySelector('#profile-pic-btn');
+                picURLInput = document.querySelector('#picURL');
+                picSubmit = document.querySelector('#pp-submit');
+                picBtn.addEventListener('click', () => {
+                    picForm.style.display = 'block';
+                    picBtn.style.display = 'none';
+
+                    picURLInput.addEventListener('input', () => {
+                        if (picURLInput.value.length === 0) {
+                            picSubmit.innerHTML = 'Remove';
+                        } else {
+                            picSubmit.innerHTML = 'Submit'
+                        }
+                    })
+
+                    document.querySelector('#pp-cancel').addEventListener('click', () => {
+                        picForm.style.display = 'none';
+                        picBtn.style.display = 'block';
+                    })
+                    
+                })
+            } catch (TypeError) {
+            //
+            }
+        })
+
+        
+
+    </script>
+
+{% endblock %}
+
+{% block body %}
+
+    <div class="grid grid-one-two">
+        <div id="user-container">
+            <h2 class="ta-center"><strong>{{ user.username|upper }}</strong></h2>
+            <div class="picture-container">
+                <img src="{% if not profile.picture %}https://i.ibb.co/YfKj1mp/Black-Pepper.png{% else %}{{profile.picture.url}}{% endif %}" alt="User's profile picture" class="user-profile-picture">
+            </div>
+            {% if request.user != profile.user %}
+            <form action="{% url 'follow' user.username %}" method="post">
+                {% csrf_token %}
+                <button id="watch" type="submit">
+                    {% if request.user in profile.followed_by.all %} Watching {% else %} Watch {% endif %}
+                </button>
+            </form>
+            {% else %}
+            <details class="ta-center profile-options">
+                <summary role="button" class="outline">Options</summary>
+                    <button id="password-btn" style="font-size:large; text-align: left;" class="outline secondary">Change Password</button>
+                    <button id="profile-pic-btn" class="outline secondary" style="font-size:large; text-align:left; margin: 1rem 0 1rem 0;">Change Profile Picture</button>
+                    <form id="picture-form" style="display:none;" action="{% url 'profile_picture' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" placeholder="Image URL" name="picURL" id="picURL" accept="image/*">
+                        <div class="grid mobile-grid">
+                            <button id="pp-cancel" class="outline secondary error width10" type="button" style="font-size: large;">Cancel</button>
+                            <button id="pp-submit" class="outline width10" type="submit" style="font-size: large;">Remove</button>
+                        </div>
+                    </form>
+                    <a class="outline secondary help-app" role="button" href="/help" target="_blank">Help</a>
+              </details>
+            {% endif %}
+            <article>
+                <header>
+                    <div class="ta-center">
+
+                        <em id="bio">
+                            {% if profile.bio %}
+                                {{ profile.bio }}
+                            {% else %}
+                                No bio.
+                            {% endif %}
+                        </em>
+                        {% if request.user == profile.user %}
+                        <button id="edit-btn" class="margin1-t outline contrast">Change</button>
+                        <form style="display:none" id="edit-bio" action="{% url 'edit_bio' %}" method="post">
+                            {% csrf_token %}
+                            <input name="new_bio" type="text" maxlength="128" value="{{ profile.bio }}">
+                            <button type="submit" class="contrast">Save</button>
+                        </form>
+                        {% endif %}
+                        
+                    </div>
+                </header>
+
+                <p><strong>Recipes:</strong> {{ profile.recipe.count }}</p>
+                <p><strong>Fans:</strong> {{ profile.followed_by.count }}</p>
+                {% if request.user == profile.user %}
+                <p><a href="{% url 'following' %}">Watching: {{ profile.following.count }}</a></p>
+                {% endif %}
+                
+            </article>
+        </div>
+        <div id="profile-recipe-container">
+            <article>
+                <header><strong>Latest</strong></header>
+                {% for recipe in page_obj %}
+                    <div class="id-recipe grid profile-recipe">
+                        <a href="{% url 'recipe' recipe.id %}">
+                            <span class="image-link"></span>
+                        </a>
+                        <img class="profile-image" src="{% if recipe.image %}{{ recipe.image.url }}{% else %}https://i.ibb.co/nCpzBM5/DALL-E-2023-01-30-11-48-47-cooking-egg-with-cast-iron-skillet-3-D-pixel-art.png{% endif %}" alt="recipe">
+                        <p><strong>{{ recipe.title }}</strong></p>
+                        <p class="block ta-justify"><em>{{ recipe.description }}</em></p>
+                    </div>
+                    {% empty %}
+                         <p>Nothing to show.</p>
+                {% endfor %}
+                {% if page_obj %}
+                <footer>
+                    <div class="grid ta-center">
+                        <div class="grid">
+                            {% if page_obj.has_previous %}
+                                <a class="pagination-link" href="{% url 'profile' user.username %}">
+                                    <i class="fa-solid fa-backward-step"></i>
+                                </a>
+                                <a class="pagination-link" href="{% url 'profile_page' user.username page_obj.previous_page_number %}">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div>
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                        </div>
+                        <div class="grid">
+                            {% if page_obj.has_next %}
+                                <a class="pagination-link" href="{% url 'profile_page' user.username page_obj.next_page_number %}">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                                <a class="pagination-link" href="{% url 'profile_page' user.username page_obj.paginator.num_pages %}">
+                                    <i class="fa-solid fa-forward-step"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </footer>
+                {% endif %}
+            </article>
+        </div>   
+    </div>
+    {% if request.user == profile.user %}
+    <form action="{% url 'change_password' %}" method="post">
+        {% csrf_token %}
+        <dialog id="modal">
+            <article style="width: 100vw" class="ta-center">
+                <h3>Change Password</h3>
+                <div class="grid">
+                    <p style="text-align:left">Current password:</p>
+                    <input name="current-password" type="password" placeholder="Your password">
+                </div>
+                <div class="grid">
+                    <p style="text-align:left">New password:</p>
+                    <input id="new-password" name="new-password" type="password" placeholder="Choose a new password">
+                </div>
+                <div class="grid">
+                    <p style="text-align:left">Confirm:</p>
+                    <input id="confirm-password" name="confirm-password" type="password" placeholder="Re-enter">
+                </div>
+                <p class="error" id="error"></p>
+            {% if error_message %}
+                <p class="error" id="error-msg">{{ error_message }}</p>
+            {% endif %}
+            <footer class="grid">
+                <button id="password-cancel" type="button" class="secondary">Cancel</button>
+                <button id="submit-password" type="submit" disabled>Confirm</button>
+            </footer>
+            </article>
+        </dialog>
+    </form>
+    {% endif %}
+
+{% endblock %}
